@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Mudanzas D'La 14 — Cotiza tu mudanza o flete en minutos. El mejor servicio al mejor precio. Sin registro requerido.">
   <title>Mudanzas D'La 14 — Cotiza tu Mudanza</title>
+  <link rel="icon" type="image/png" href="img/logo.png">
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <!-- Google Fonts -->
@@ -27,11 +28,7 @@
 <nav class="navbar">
   <div class="container">
     <a class="navbar-brand" href="#inicio" data-tab="inicio">
-      <i class="fas fa-truck-moving navbar-icon"></i>
-      <div class="navbar-logo-text">
-        MUDANZAS <span class="d14">D'LA 14</span>
-        <span class="sub">El mejor servicio al mejor precio</span>
-      </div>
+      <img src="img/logo.png" alt="Mudanzas D'La 14" class="navbar-logo-img">
     </a>
     <div class="navbar-links">
       <a href="#inicio" data-tab="inicio" class="active">Inicio</a>
@@ -179,21 +176,6 @@
 
       <!-- Right: form card -->
       <div>
-        <!-- Price Preview -->
-        <div class="price-preview">
-          <div class="price-preview-title"><i class="fas fa-calculator" style="color:var(--red)"></i> Estimado actual</div>
-          <div class="price-preview-amount">
-            <span id="priceAmount">$0</span>
-            <small>MXN con IVA</small>
-          </div>
-          <div class="price-breakdown" id="priceBreakdown">
-            <div class="price-line">
-              <span class="price-label"><i class="fas fa-info-circle"></i> Selecciona una unidad para ver el desglose</span>
-              <span>—</span>
-            </div>
-          </div>
-        </div>
-
         <!-- Quote Card -->
         <div class="quote-card" id="quoteCard">
           <h3><i class="fas fa-truck-moving"></i> Solicitar Cotización</h3>
@@ -316,6 +298,23 @@
                 </div>
               </div>
 
+              <!-- Coverage warning banner -->
+              <div class="coverage-warning" id="coverageWarning" style="display:none">
+                <i class="fas fa-exclamation-triangle coverage-warning-icon"></i>
+                <div class="coverage-warning-body">
+                  <div class="coverage-warning-title">
+                    ¡Distancia fuera de cobertura en línea! (<span id="coverageKmVal">0</span> km)
+                  </div>
+                  <p class="coverage-warning-desc">
+                    El cotizador calcula automáticamente rutas de hasta <span id="coverageMaxVal">500</span> km.
+                    Para viajes de mayor distancia o fletes foráneos especiales, con gusto te brindamos atención personalizada con logística dedicada.
+                  </p>
+                  <a class="btn-coverage-wa" id="coverageWaBtn" href="#" target="_blank">
+                    <i class="fab fa-whatsapp"></i> Cotizar viaje especial por WhatsApp
+                  </a>
+                </div>
+              </div>
+
               <!-- Date + service type -->
               <div class="form-row">
                 <div class="form-group">
@@ -383,6 +382,21 @@
                   <i class="fas fa-check-circle"></i>
                   <span><strong id="furnitureSummaryText">0 artículos registrados</strong> en el inventario preliminar</span>
                 </div>
+
+                <!-- Custom Furniture Items -->
+                <div class="custom-furniture-box">
+                  <div class="custom-furniture-header">
+                    <i class="fas fa-plus-circle" style="color:var(--red)"></i>
+                    <div>
+                      <strong>¿Vas a mudar objetos o muebles que no están en la lista?</strong>
+                      <div style="font-size:0.78rem;color:var(--gray-dark)">Escribe aquí cualquier artículo especial, maquinaria o mobiliario:</div>
+                    </div>
+                  </div>
+                  <div id="customFurnitureList" class="custom-furniture-list"></div>
+                  <button type="button" class="btn btn-outline-white btn-sm" id="btnAddCustomItem" style="margin-top:.6rem;font-size:.82rem;padding:.45rem .9rem">
+                    <i class="fas fa-plus"></i> Agregar artículo personalizado
+                  </button>
+                </div>
               </div>
               <div class="step-actions">
                 <button type="button" class="btn btn-secondary" data-prev="3"><i class="fas fa-arrow-left"></i> Anterior</button>
@@ -413,13 +427,28 @@
               </div>
               <div class="step-actions">
                 <button type="button" class="btn btn-secondary" data-prev="4"><i class="fas fa-arrow-left"></i> Anterior</button>
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="btn btn-primary btn-confirm-quote">
                   <i class="fas fa-paper-plane"></i> Confirmar Cotización
                 </button>
               </div>
             </div>
 
           </form>
+
+          <!-- Price Preview (desglose preliminar abajo del formulario) -->
+          <div class="price-preview" id="pricePreview">
+            <div class="price-preview-title"><i class="fas fa-calculator" style="color:var(--red)"></i> Estimado actual</div>
+            <div class="price-preview-amount">
+              <span id="priceAmount">$0</span>
+              <small>MXN con IVA</small>
+            </div>
+            <div class="price-breakdown" id="priceBreakdown">
+              <div class="price-line">
+                <span class="price-label"><i class="fas fa-info-circle"></i> Selecciona una unidad para ver el desglose</span>
+                <span>—</span>
+              </div>
+            </div>
+          </div>
         </div><!-- /quote-card -->
 
         <!-- Quote Result -->
@@ -470,7 +499,7 @@
   <div class="container">
     <span class="tag">Lo que Ofrecemos</span>
     <h2 class="section-title mt-2">Nuestros <span>Servicios</span></h2>
-    <div class="services-grid">
+    <div class="services-grid" id="publicServicesGrid">
       <div class="service-card">
         <div class="service-icon"><i class="fas fa-home"></i></div>
         <h3>Mudanza Residencial</h3>

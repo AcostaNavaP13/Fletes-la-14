@@ -32,8 +32,15 @@ const DEFAULT_CONFIG = {
   distanceRanges: {
     local:   { label: 'Local',             min: 0,   max: 30,  multiplier: 1.0 },
     foraneo: { label: 'Foráneo',           min: 31,  max: 150, multiplier: 1.15 },
-    largo:   { label: 'Largo Recorrido',   min: 151, max: 1500, multiplier: 1.25 }
-  }
+    largo:   { label: 'Largo Recorrido',   min: 151, max: 500, multiplier: 1.25 },
+    maxCoverageKm: 500
+  },
+  serviceTypes: [
+    { id: 'local',      name: 'Mudanza local',      desc: 'Dentro de la zona metropolitana', icon: 'fa-truck', active: true },
+    { id: 'foraneo',    name: 'Mudanza foránea',    desc: 'Traslados intermunicipales o interestatales', icon: 'fa-road', active: true },
+    { id: 'flete',      name: 'Solo flete',         desc: 'Transporte puntual de carga o mercancía', icon: 'fa-box', active: true },
+    { id: 'compartida', name: 'Mudanza compartida', desc: 'Ruta económica compartida para cargas menores', icon: 'fa-users', active: true }
+  ]
 };
 
 // Firebase Configuration
@@ -95,6 +102,16 @@ function getConfig() {
           if (u.active === undefined) u.active = true;
           if (!u.icon) u.icon = 'fa-truck';
         });
+      }
+      // Ensure serviceTypes exists
+      if (!Array.isArray(parsed.serviceTypes) || parsed.serviceTypes.length === 0) {
+        parsed.serviceTypes = JSON.parse(JSON.stringify(DEFAULT_CONFIG.serviceTypes));
+      }
+      // Ensure maxCoverageKm exists
+      if (!parsed.distanceRanges) {
+        parsed.distanceRanges = JSON.parse(JSON.stringify(DEFAULT_CONFIG.distanceRanges));
+      } else if (!parsed.distanceRanges.maxCoverageKm) {
+        parsed.distanceRanges.maxCoverageKm = parsed.distanceRanges.largo?.max || 500;
       }
       return parsed;
     }
@@ -204,6 +221,9 @@ function calculateQuote({ unitId, km, extraIds = [] }) {
   if (km > ranges.local.max && km <= ranges.foraneo.max) rangeLabel = ranges.foraneo.label;
   else if (km > ranges.foraneo.max) rangeLabel = ranges.largo.label;
 
+  const maxCoverageKm = ranges.maxCoverageKm || ranges.largo?.max || 500;
+  const exceedsCoverage = km > maxCoverageKm;
+
   return {
     unit:        { name: unit.name, icon: unit.icon },
     km,
@@ -214,7 +234,9 @@ function calculateQuote({ unitId, km, extraIds = [] }) {
     extrasDetail,
     subtotal,
     iva,
-    total
+    total,
+    exceedsCoverage,
+    maxCoverageKm
   };
 }
 

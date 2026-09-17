@@ -107,7 +107,7 @@ const FURNITURE_CATALOG = {
 
 /* ── State (object reference shared with maps.js via window.quoteData) ── */
 let currentStep = 1;
-let quoteData   = { km: 50, unitId: null, extraIds: [], furniture: {} };
+let quoteData   = { km: 50, unitId: null, extraIds: [], furniture: {}, customFurniture: [] };
 let quoteResult = null;
 
 // Expose object reference to maps.js (MUST be the same object — not a copy)
@@ -129,6 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Listen for real-time Firestore config updates
   window.addEventListener('mudanzas:configUpdated', () => {
     loadContact();
+    renderServiceTypes();
     renderUnitCards();
     renderExtras();
     updatePricePreview();
@@ -137,7 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /* ── Theme Toggle (Claro / Oscuro) ── */
 function initTheme() {
-  const savedTheme = localStorage.getItem('mudanzas14_theme') || 'dark';
+  const savedTheme = localStorage.getItem('mudanzas14_theme') || 'light';
   applyTheme(savedTheme);
 
   const toggleBtns = [document.getElementById('themeToggleBtn'), document.getElementById('themeToggleMobileBtn')].filter(Boolean);
@@ -255,18 +256,109 @@ function loadContact() {
   }
 }
 
-function setTextById(id, text) {
-  const el = document.getElementById(id);
-  if (el) el.textContent = text;
+/* ── Service Types ── */
+function renderServiceTypes() {
+  const cfg = window.MudanzasCalc.getConfig();
+  const select = document.getElementById('tipoServicio');
+  if (select && Array.isArray(cfg.serviceTypes)) {
+    const curVal = select.value;
+    select.innerHTML = '';
+    cfg.serviceTypes.filter(s => s.active !== false).forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s.id;
+      opt.textContent = `${s.name}`;
+      select.appendChild(opt);
+    });
+    if (curVal && Array.from(select.options).some(o => o.value === curVal)) {
+      select.value = curVal;
+    }
+  }
+
+  // Public services grid in tab-servicios
+  const grid = document.getElementById('publicServicesGrid');
+  if (grid && Array.isArray(cfg.serviceTypes) && cfg.serviceTypes.length > 0) {
+    grid.innerHTML = '';
+    cfg.serviceTypes.filter(s => s.active !== false).forEach(s => {
+      const card = document.createElement('div');
+      card.className = 'service-card';
+      card.innerHTML = `
+        <div class="service-icon"><i class="fas ${s.icon || 'fa-truck'}"></i></div>
+        <h3>${s.name}</h3>
+        <p>${s.desc || ''}</p>
+      `;
+      grid.appendChild(card);
+    });
+  }
+}
+
+/* ── Custom Furniture Items ── */
+function initCustomFurniture() {
+  const btnAdd = document.getElementById('btnAddCustomItem');
+  if (btnAdd) {
+    btnAdd.addEventListener('click', () => {
+      if (!Array.isArray(quoteData.customFurniture)) quoteData.customFurniture = [];
+      quoteData.customFurniture.push({ id: 'custom_' + Date.now(), name: '', qty: 1 });
+      renderCustomFurniture();
+      setTimeout(() => {
+        const inputs = document.querySelectorAll('.custom-furniture-input');
+        if (inputs.length) inputs[inputs.length - 1].focus();
+      }, 50);
+    });
+  }
+  renderCustomFurniture();
+}
+
+function renderCustomFurniture() {
+  const list = document.getElementById('customFurnitureList');
+  if (!list) return;
+  list.innerHTML = '';
+  if (!Array.isArray(quoteData.customFurniture)) quoteData.customFurniture = [];
+  quoteData.customFurniture.forEach((item, idx) => {
+    const row = document.createElement('div');
+    row.className = 'custom-furniture-row';
+    row.innerHTML = `
+      <input type="text" class="custom-furniture-input" placeholder="Nombre del artículo (ej. Vitrina grande, Piano...)" value="${item.name || ''}" data-idx="${idx}">
+      <div class="qty-controls">
+        <button type="button" class="qty-btn" data-action="dec" data-idx="${idx}"><i class="fas fa-minus"></i></button>
+        <input type="number" class="qty-input" value="${item.qty || 1}" min="1" max="20" readonly>
+        <button type="button" class="qty-btn" data-action="inc" data-idx="${idx}"><i class="fas fa-plus"></i></button>
+      </div>
+      <button type="button" class="btn-delete-custom-item" data-idx="${idx}" title="Eliminar artículo">
+        <i class="fas fa-trash-alt"></i>
+      </button>
+    `;
+    row.querySelector('.custom-furniture-input').addEventListener('input', (e) => {
+      quoteData.customFurniture[idx].name = e.target.value.trim();
+      updateFurnitureSummary();
+    });
+    row.querySelectorAll('.qty-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        let q = quoteData.customFurniture[idx].qty || 1;
+        if (btn.dataset.action === 'inc') q = Math.min(20, q + 1);
+        else q = Math.max(1, q - 1);
+        quoteData.customFurniture[idx].qty = q;
+        row.querySelector('.qty-input').value = q;
+        updateFurnitureSummary();
+      });
+    });
+    row.querySelector('.btn-delete-custom-item').addEventListener('click', () => {
+      quoteData.customFurniture.splice(idx, 1);
+      renderCustomFurniture();
+      updateFurnitureSummary();
+    });
+    list.appendChild(row);
+  });
 }
 
 /* ─────────────────────────────────────
    QUOTE FORM
 ───────────────────────────────────── */
 function initQuoteForm() {
+  renderServiceTypes();
   renderUnitCards();
   renderExtras();
   renderFurnitureTabs();
+  initCustomFurniture();
 
   // Step navigation breadcrumb buttons
   document.querySelectorAll('.step-btn').forEach(btn => {
@@ -428,6 +520,11 @@ function updateFurnitureSummary() {
   Object.values(quoteData.furniture).forEach(room => {
     Object.values(room).forEach(qty => { total += parseInt(qty) || 0; });
   });
+  if (Array.isArray(quoteData.customFurniture)) {
+    quoteData.customFurniture.forEach(cf => {
+      if (cf.name && cf.qty > 0) total += parseInt(cf.qty) || 0;
+    });
+  }
   const summaryEl = document.getElementById('furnitureSummary');
   const textEl    = document.getElementById('furnitureSummaryText');
   if (summaryEl && textEl) {
@@ -440,7 +537,43 @@ function updateFurnitureSummary() {
 function updatePricePreview() {
   const amountEl    = document.getElementById('priceAmount');
   const breakdownEl = document.getElementById('priceBreakdown');
+  const covWarn     = document.getElementById('coverageWarning');
+  const kmVal       = document.getElementById('coverageKmVal');
+  const maxVal      = document.getElementById('coverageMaxVal');
+  const waBtn       = document.getElementById('coverageWaBtn');
+  const cfg         = window.MudanzasCalc.getConfig();
+
   if (!amountEl || !breakdownEl) return;
+
+  const result = window.MudanzasCalc.calculateQuote(quoteData);
+  quoteResult  = result;
+
+  // Handle Coverage Limits
+  if (result && result.exceedsCoverage) {
+    if (covWarn) {
+      covWarn.style.display = 'flex';
+      if (kmVal) kmVal.textContent = result.km;
+      if (maxVal) maxVal.textContent = result.maxCoverageKm;
+      if (waBtn) {
+        const orig = (document.getElementById('origen')?.value || '').trim() || 'mi origen';
+        const dest = (document.getElementById('destino')?.value || '').trim() || 'mi destino';
+        waBtn.href = `https://wa.me/${cfg.contact.whatsapp}?text=Hola,%20solicito%20cotización%20especial%20para%20un%20flete/mudanza%20de%20${result.km}%20km%20(De:%20${encodeURIComponent(orig)}%20A:%20${encodeURIComponent(dest)})`;
+      }
+    }
+    amountEl.innerHTML = '<span style="font-size:1.35rem;color:#f59e0b">Cotización Especial</span>';
+    breakdownEl.innerHTML = `
+      <div class="price-line" style="color:#f59e0b">
+        <span class="price-label"><i class="fas fa-exclamation-triangle" style="color:#f59e0b"></i> Ruta de ${result.km} km supera cobertura automática (${result.maxCoverageKm} km)</span>
+        <span style="font-weight:700">Vía WhatsApp</span>
+      </div>
+      <div style="font-size:.82rem;color:var(--gray);margin-top:.4rem;line-height:1.45">
+        Para viajes foráneos de larga distancia, por favor contáctanos vía WhatsApp para coordinar logística y ofrecerte la mejor tarifa personalizada con unidad dedicada.
+      </div>
+    `;
+    return;
+  } else {
+    if (covWarn) covWarn.style.display = 'none';
+  }
 
   if (!quoteData.unitId) {
     amountEl.textContent   = '$0';
@@ -448,8 +581,6 @@ function updatePricePreview() {
     return;
   }
 
-  const result = window.MudanzasCalc.calculateQuote(quoteData);
-  quoteResult  = result;
   if (!result) return;
 
   const fmt = window.MudanzasCalc.formatMXN;
@@ -502,6 +633,14 @@ function goToStep(step) {
     if (n === step) btn.classList.add('active');
     else if (n < step) btn.classList.add('done');
   });
+
+  // Smooth scroll to top of quoteCard so user doesn't feel the page "se baja"
+  const quoteCard = document.getElementById('quoteCard');
+  if (quoteCard) {
+    const yOffset = -75;
+    const y = quoteCard.getBoundingClientRect().top + window.pageYOffset + yOffset;
+    window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+  }
 
   // If entering step 1 and map exists, refresh size
   if (step === 1 && window.MapState && window.MapState.map) {
@@ -580,6 +719,17 @@ function submitQuote() {
     });
   });
 
+  // Custom furniture items
+  if (Array.isArray(quoteData.customFurniture)) {
+    quoteData.customFurniture.forEach(cf => {
+      if (cf.name && cf.qty > 0) {
+        furnitureTotal += cf.qty;
+        const qtyStr = String(cf.qty).padStart(2, ' ') + 'x';
+        furnitureRows.push(` ${qtyStr}  ${cf.name} (Especial / Otro)`);
+      }
+    });
+  }
+
   let furnitureBlock = '';
   if (furnitureRows.length > 0) {
     furnitureBlock =
@@ -649,8 +799,9 @@ function submitQuote() {
     msgLines.push(`📅 *Fecha tentativa:* ${fecha}`);
   }
   if (tipoServ) {
-    const tipos = { local: 'Mudanza local', foraneo: 'Mudanza foránea', flete: 'Solo flete', compartida: 'Mudanza compartida' };
-    msgLines.push(`🏷️ *Tipo de servicio:* ${tipos[tipoServ] || tipoServ}`);
+    const customType = (cfg.serviceTypes || []).find(st => st.id === tipoServ);
+    const tipoLabel = customType ? customType.name : (tipoServ === 'local' ? 'Mudanza local' : tipoServ);
+    msgLines.push(`🏷️ *Tipo de servicio:* ${tipoLabel}`);
   }
 
   if (furnitureBlock) {
@@ -775,6 +926,11 @@ function generatePDF() {
       }
     });
   });
+  if (Array.isArray(quoteData.customFurniture)) {
+    quoteData.customFurniture.forEach(cf => {
+      if (cf.name && cf.qty > 0) furnitureItems.push(`${cf.qty}x ${cf.name} (Especial/Otro)`);
+    });
+  }
   if (furnitureItems.length > 0) {
     doc.setTextColor(13, 13, 13);
     doc.setFont('helvetica', 'bold');
@@ -809,7 +965,8 @@ function generatePDF() {
 /* ── Reset Quote ── */
 function resetQuote() {
   // FIX #1: use Object.assign to mutate existing object (window.quoteData keeps its reference)
-  Object.assign(quoteData, { km: 50, unitId: null, extraIds: [], furniture: {} });
+  Object.assign(quoteData, { km: 50, unitId: null, extraIds: [], furniture: {}, customFurniture: [] });
+  renderCustomFurniture();
 
   quoteResult = null;
 

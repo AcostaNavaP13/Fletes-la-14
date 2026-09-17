@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /* ── Theme (Claro / Oscuro) ── */
 function initTheme() {
-  const savedTheme = localStorage.getItem('mudanzas14_theme') || 'dark';
+  const savedTheme = localStorage.getItem('mudanzas14_theme') || 'light';
   applyTheme(savedTheme);
 
   const btn = document.getElementById('themeToggleAdminBtn');
@@ -146,6 +146,9 @@ function loadAllSettings() {
   const dr = cfg.distanceRanges;
   document.getElementById('localMax').value        = dr.local.max;
   document.getElementById('foraneoMax').value      = dr.foraneo.max;
+  if (document.getElementById('maxCoverageKm')) {
+    document.getElementById('maxCoverageKm').value = dr.maxCoverageKm || dr.largo?.max || 500;
+  }
   document.getElementById('localMult').value       = dr.local.multiplier;
   document.getElementById('foraneoMult').value     = dr.foraneo.multiplier;
   document.getElementById('largoMult').value       = dr.largo.multiplier;
@@ -153,8 +156,65 @@ function loadAllSettings() {
   // Units table
   renderUnitsTable(cfg);
 
+  // Services table
+  renderServicesTable(cfg);
+
   // Extras table
   renderExtrasTable(cfg);
+}
+
+/* ── Service Types Table (CRUD) ── */
+function renderServicesTable(cfg) {
+  const tbody = document.getElementById('servicesTableBody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  if (!Array.isArray(cfg.serviceTypes)) cfg.serviceTypes = [];
+  cfg.serviceTypes.forEach((srv, idx) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>
+        <div style="display:flex;align-items:center;gap:.5rem">
+          <i class="fas ${srv.icon || 'fa-truck'}" style="color:var(--red)"></i>
+          <input type="text" value="${srv.name}" data-field="name" data-idx="${idx}" style="min-width:140px;font-weight:600">
+        </div>
+      </td>
+      <td>
+        <input type="text" value="${srv.desc || ''}" data-field="desc" data-idx="${idx}" style="min-width:220px;font-size:.82rem">
+      </td>
+      <td>
+        <input type="text" value="${srv.icon || 'fa-truck'}" data-field="icon" data-idx="${idx}" style="width:110px;font-size:.82rem">
+      </td>
+      <td>
+        <label class="unit-active-toggle" title="Ocultar o mostrar al cliente">
+          <input type="checkbox" ${srv.active !== false ? 'checked' : ''} data-field="active" data-idx="${idx}">
+          <span class="toggle-slider"></span>
+        </label>
+      </td>
+      <td>
+        <button type="button" class="btn-delete-item" data-action="delete-service" data-idx="${idx}" title="Eliminar servicio" style="background:transparent;border:none;color:var(--red);cursor:pointer;font-size:.95rem;padding:.3rem .5rem">
+          <i class="fas fa-trash-alt"></i>
+        </button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  // Wire delete buttons
+  tbody.querySelectorAll('[data-action="delete-service"]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const idx = parseInt(btn.dataset.idx);
+      const cfgNow = window.MudanzasCalc.getConfig();
+      if (cfgNow.serviceTypes.length <= 1) {
+        showAdminToast('Debe existir al menos un tipo de servicio', 'error');
+        return;
+      }
+      if (confirm(`¿Eliminar el tipo de servicio "${cfgNow.serviceTypes[idx].name}"?`)) {
+        cfgNow.serviceTypes.splice(idx, 1);
+        await executeConfigSave(cfgNow, null, 'Tipo de servicio eliminado');
+        renderServicesTable(cfgNow);
+      }
+    });
+  });
 }
 
 /* ── Units Table (CRUD) ── */
@@ -317,6 +377,43 @@ function initSaveButtons() {
   }
 
   // Add Extra button
+  // Add Service Type button
+  const btnAddService = document.getElementById('btnAddService');
+  if (btnAddService) {
+    btnAddService.addEventListener('click', async () => {
+      const cfg = window.MudanzasCalc.getConfig();
+      if (!Array.isArray(cfg.serviceTypes)) cfg.serviceTypes = [];
+      const newId = 'serv_' + Date.now().toString(36);
+      cfg.serviceTypes.push({
+        id: newId,
+        name: 'Nuevo Tipo de Servicio',
+        desc: 'Descripción del servicio',
+        icon: 'fa-truck',
+        active: true
+      });
+      await executeConfigSave(cfg, null, 'Nuevo tipo de servicio agregado');
+      renderServicesTable(cfg);
+    });
+  }
+
+  // Save Service Types
+  const btnSaveServices = document.getElementById('saveServices');
+  if (btnSaveServices) {
+    btnSaveServices.addEventListener('click', async () => {
+      const cfg = window.MudanzasCalc.getConfig();
+      if (!Array.isArray(cfg.serviceTypes)) cfg.serviceTypes = [];
+      document.querySelectorAll('#servicesTableBody [data-field]').forEach(inp => {
+        const idx   = parseInt(inp.dataset.idx);
+        const field = inp.dataset.field;
+        if (!cfg.serviceTypes[idx]) return;
+        if (field === 'active') cfg.serviceTypes[idx][field] = inp.checked;
+        else cfg.serviceTypes[idx][field] = inp.value.trim();
+      });
+      await executeConfigSave(cfg, 'servicesStatus', 'Tipos de servicio actualizados y guardados');
+    });
+  }
+
+  // Add Extra button
   const btnAddExtra = document.getElementById('btnAddExtra');
   if (btnAddExtra) {
     btnAddExtra.addEventListener('click', async () => {
@@ -357,7 +454,10 @@ function initSaveButtons() {
     cfg.distanceRanges.largo.multiplier  = parseFloat(document.getElementById('largoMult').value)   || 1.25;
     cfg.distanceRanges.foraneo.min       = cfg.distanceRanges.local.max + 1;
     cfg.distanceRanges.largo.min         = cfg.distanceRanges.foraneo.max + 1;
-    await executeConfigSave(cfg, 'distancesStatus', 'Rangos de distancia guardados');
+    const maxCov = parseFloat(document.getElementById('maxCoverageKm')?.value) || 500;
+    cfg.distanceRanges.maxCoverageKm     = maxCov;
+    cfg.distanceRanges.largo.max         = maxCov;
+    await executeConfigSave(cfg, 'distancesStatus', 'Rangos de distancia y cobertura guardados');
   });
 
   // Save Units

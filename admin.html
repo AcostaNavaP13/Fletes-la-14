@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Panel Admin — Mudanzas D'La 14</title>
+  <link rel="icon" type="image/png" href="img/logo.png">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
@@ -16,8 +17,8 @@
 ══════════════════════════════════════ -->
 <div class="login-screen" id="loginScreen">
   <div class="login-card">
-    <div class="login-logo">
-      <div class="login-logo-text">MUDANZAS <span class="red">D'LA 14</span></div>
+    <div class="login-logo" style="display:flex;flex-direction:column;align-items:center">
+      <img src="img/logo.png" alt="Mudanzas D'La 14" style="max-height:65px;max-width:240px;object-fit:contain;margin-bottom:.5rem">
       <div class="login-logo-sub">Panel de Administración</div>
     </div>
     <div class="login-title"><i class="fas fa-lock" style="color:var(--red);margin-right:.4rem"></i> Acceso Restringido</div>
@@ -53,8 +54,8 @@
 
   <!-- Sidebar -->
   <aside class="admin-sidebar" id="adminSidebar">
-    <div class="sidebar-header">
-      <div class="sidebar-logo">MUDANZAS <span class="red">D'LA 14</span></div>
+    <div class="sidebar-header" style="text-align:center">
+      <img src="img/logo.png" alt="Mudanzas D'La 14" style="max-height:48px;max-width:180px;object-fit:contain;margin-bottom:.35rem">
       <div class="sidebar-logo-sub">Panel de Control</div>
       <span class="sidebar-badge"><i class="fas fa-lock"></i> Admin</span>
     </div>
@@ -69,11 +70,14 @@
       <button class="sidebar-link" data-panel="units" data-icon="fa-truck">
         <i class="fas fa-truck"></i> Unidades y Tarifas
       </button>
+      <button class="sidebar-link" data-panel="services" data-icon="fa-concierge-bell">
+        <i class="fas fa-concierge-bell"></i> Tipos de Servicio
+      </button>
       <button class="sidebar-link" data-panel="extras" data-icon="fa-plus-circle">
         <i class="fas fa-plus-circle"></i> Servicios Adicionales
       </button>
       <button class="sidebar-link" data-panel="distances" data-icon="fa-road">
-        <i class="fas fa-road"></i> Rangos de Distancia
+        <i class="fas fa-road"></i> Rangos y Cobertura
       </button>
       <button class="sidebar-link" data-panel="contact" data-icon="fa-address-book">
         <i class="fas fa-address-book"></i> Información de Contacto
@@ -217,6 +221,42 @@
         </div>
       </div>
 
+      <!-- ── SERVICE TYPES ── -->
+      <div class="admin-panel" id="panelServices">
+        <div class="settings-card full">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:.75rem">
+            <div>
+              <h3><i class="fas fa-concierge-bell"></i> Tipos de Servicio</h3>
+              <p style="color:var(--gray-dark);font-size:.85rem;margin-top:.3rem">Personaliza los tipos de servicio disponibles en el formulario de cotización y en la sección pública de Servicios.</p>
+            </div>
+            <button type="button" class="btn-save" id="btnAddService" style="padding:.5rem 1rem;font-size:.82rem">
+              <i class="fas fa-plus"></i> Nuevo Tipo de Servicio
+            </button>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="units-table">
+              <thead>
+                <tr>
+                  <th>Nombre del Servicio</th>
+                  <th>Descripción</th>
+                  <th>Icono (FontAwesome)</th>
+                  <th>Visible</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="servicesTableBody">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+          <div class="save-bar">
+            <span class="save-status" id="servicesStatus"><i class="fas fa-check-circle"></i> Guardado</span>
+            <button class="btn-reset" data-reset="services"><i class="fas fa-undo"></i> Restablecer</button>
+            <button class="btn-save" id="saveServices"><i class="fas fa-save"></i> Guardar Cambios</button>
+          </div>
+        </div>
+      </div>
+
       <!-- ── EXTRAS ── -->
       <div class="admin-panel" id="panelExtras">
         <div class="settings-card full">
@@ -268,7 +308,12 @@
               <input class="form-control" id="foraneoMax" type="number" min="1" placeholder="150">
               <div class="form-note">Entre Local y este km = Foráneo</div>
             </div>
-            <p style="font-size:.78rem;color:var(--gray-dark)">* Largo recorrido: cualquier distancia mayor al máximo foráneo</p>
+            <div class="form-group">
+              <label><i class="fas fa-ban" style="color:var(--red)"></i> Cobertura Máxima en Línea (km)</label>
+              <input class="form-control" id="maxCoverageKm" type="number" min="10" placeholder="500">
+              <div class="form-note" style="color:var(--red)">Si el viaje supera estos km, se avisa que no hay cobertura automática y se deriva a WhatsApp para cotización especial.</div>
+            </div>
+            <p style="font-size:.78rem;color:var(--gray-dark)">* Largo recorrido: viajes entre el máximo foráneo y la cobertura máxima</p>
           </div>
           <div class="settings-card">
             <h3><i class="fas fa-percentage"></i> Multiplicadores de Precio</h3>
