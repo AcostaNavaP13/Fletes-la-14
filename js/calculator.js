@@ -3,11 +3,14 @@
  * Mudanzas D'La 14
  */
 
+const CONFIG_VERSION = 2; // Incrementar este número cada vez que cambies precios en GitHub para que se actualice a todos
+
 const DEFAULT_CONFIG = {
+  version: CONFIG_VERSION,
   password: 'Pruebas1234',
   contact: {
-    whatsapp: '5219991234567',
-    phone: '(999) 123-4567',
+    whatsapp: '5212221234567',
+    phone: '(222) 123-4567',
     email: 'contacto@mudanzasdla14.com',
     address: 'Puebla, Puebla, México',
     hours: 'Lun–Sáb 7:00am – 8:00pm'
@@ -41,6 +44,11 @@ function getConfig() {
     const stored = localStorage.getItem('mudanzas14_config');
     if (stored) {
       const parsed = JSON.parse(stored);
+      // Si la versión en el código es más reciente, forzar actualización para todos los usuarios
+      if (!parsed.version || parsed.version < CONFIG_VERSION) {
+        saveConfig(DEFAULT_CONFIG);
+        return JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+      }
       // Migrate legacy password if it was admin14
       if (parsed.password === 'admin14') {
         parsed.password = 'Pruebas1234';
