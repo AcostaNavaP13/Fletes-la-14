@@ -266,12 +266,39 @@ function renderExtrasTable(cfg) {
   });
 }
 
+/* ── Helper for async config save ── */
+async function executeConfigSave(cfg, statusId, successMsg) {
+  const badge = document.getElementById('firebaseStatusBadge');
+  const badgeText = document.getElementById('firebaseStatusText');
+
+  const res = await window.MudanzasCalc.saveConfig(cfg);
+  if (statusId) showSaveStatus(statusId);
+
+  if (res && res.cloud) {
+    showAdminToast(`${successMsg} (Sincronizado en la nube ✓)`, 'success');
+    if (badge && badgeText) {
+      badge.style.background = 'rgba(16,185,129,.12)';
+      badge.style.borderColor = 'rgba(16,185,129,.3)';
+      badge.style.color = '#10b981';
+      badgeText.textContent = 'Firebase Sincronizado';
+    }
+  } else {
+    showAdminToast(`${successMsg} (Guardado local. Revisa reglas de Firebase si requieres nube)`, 'warning');
+    if (badge && badgeText) {
+      badge.style.background = 'rgba(245,158,11,.12)';
+      badge.style.borderColor = 'rgba(245,158,11,.3)';
+      badge.style.color = '#f59e0b';
+      badgeText.textContent = 'Modo Local (Sin Nube)';
+    }
+  }
+}
+
 /* ── Save Buttons & New Item Listeners ── */
 function initSaveButtons() {
   // Add Unit button
   const btnAddUnit = document.getElementById('btnAddUnit');
   if (btnAddUnit) {
-    btnAddUnit.addEventListener('click', () => {
+    btnAddUnit.addEventListener('click', async () => {
       const cfg = window.MudanzasCalc.getConfig();
       const newId = 'unit_' + Date.now().toString(36);
       cfg.units.push({
@@ -283,17 +310,16 @@ function initSaveButtons() {
         icon: 'fa-truck',
         active: true
       });
-      window.MudanzasCalc.saveConfig(cfg);
+      await executeConfigSave(cfg, null, 'Nueva unidad agregada');
       renderUnitsTable(cfg);
       renderDashboard();
-      showAdminToast('Nueva unidad agregada. Puedes editar sus datos y guardar.', 'success');
     });
   }
 
   // Add Extra button
   const btnAddExtra = document.getElementById('btnAddExtra');
   if (btnAddExtra) {
-    btnAddExtra.addEventListener('click', () => {
+    btnAddExtra.addEventListener('click', async () => {
       const cfg = window.MudanzasCalc.getConfig();
       const newId = 'extra_' + Date.now().toString(36);
       cfg.extras.push({
@@ -304,28 +330,25 @@ function initSaveButtons() {
         icon: 'fa-plus-circle',
         active: true
       });
-      window.MudanzasCalc.saveConfig(cfg);
+      await executeConfigSave(cfg, null, 'Nuevo servicio adicional agregado');
       renderExtrasTable(cfg);
       renderDashboard();
-      showAdminToast('Nuevo servicio adicional agregado. Edita sus datos y guarda.', 'success');
     });
   }
 
   // Save Contact
-  document.getElementById('saveContact').addEventListener('click', () => {
+  document.getElementById('saveContact').addEventListener('click', async () => {
     const cfg = window.MudanzasCalc.getConfig();
     cfg.contact.phone    = document.getElementById('adminPhone').value;
     cfg.contact.email    = document.getElementById('adminEmail').value;
     cfg.contact.address  = document.getElementById('adminAddress').value;
     cfg.contact.hours    = document.getElementById('adminHours').value;
     cfg.contact.whatsapp = document.getElementById('adminWhatsapp').value;
-    window.MudanzasCalc.saveConfig(cfg);
-    showSaveStatus('contactStatus');
-    showAdminToast('Información de contacto guardada ✓', 'success');
+    await executeConfigSave(cfg, 'contactStatus', 'Información de contacto guardada');
   });
 
   // Save Distance Ranges
-  document.getElementById('saveDistances').addEventListener('click', () => {
+  document.getElementById('saveDistances').addEventListener('click', async () => {
     const cfg = window.MudanzasCalc.getConfig();
     cfg.distanceRanges.local.max         = parseFloat(document.getElementById('localMax').value)    || 30;
     cfg.distanceRanges.foraneo.max       = parseFloat(document.getElementById('foraneoMax').value)  || 150;
@@ -334,13 +357,11 @@ function initSaveButtons() {
     cfg.distanceRanges.largo.multiplier  = parseFloat(document.getElementById('largoMult').value)   || 1.25;
     cfg.distanceRanges.foraneo.min       = cfg.distanceRanges.local.max + 1;
     cfg.distanceRanges.largo.min         = cfg.distanceRanges.foraneo.max + 1;
-    window.MudanzasCalc.saveConfig(cfg);
-    showSaveStatus('distancesStatus');
-    showAdminToast('Rangos de distancia guardados ✓', 'success');
+    await executeConfigSave(cfg, 'distancesStatus', 'Rangos de distancia guardados');
   });
 
   // Save Units
-  document.getElementById('saveUnits').addEventListener('click', () => {
+  document.getElementById('saveUnits').addEventListener('click', async () => {
     const cfg = window.MudanzasCalc.getConfig();
     document.querySelectorAll('#unitsTableBody [data-field]').forEach(inp => {
       const idx   = parseInt(inp.dataset.idx);
@@ -350,14 +371,12 @@ function initSaveButtons() {
       else if (field === 'basePrice' || field === 'pricePerKm') cfg.units[idx][field] = parseFloat(inp.value) || 0;
       else cfg.units[idx][field] = inp.value.trim();
     });
-    window.MudanzasCalc.saveConfig(cfg);
+    await executeConfigSave(cfg, 'unitsStatus', 'Unidades actualizadas y guardadas');
     renderDashboard();
-    showSaveStatus('unitsStatus');
-    showAdminToast('Unidades actualizadas y guardadas ✓', 'success');
   });
 
   // Save Extras
-  document.getElementById('saveExtras').addEventListener('click', () => {
+  document.getElementById('saveExtras').addEventListener('click', async () => {
     const cfg = window.MudanzasCalc.getConfig();
     document.querySelectorAll('#extrasTableBody [data-field]').forEach(inp => {
       const idx   = parseInt(inp.dataset.idx);
@@ -367,16 +386,14 @@ function initSaveButtons() {
       else if (field === 'price') cfg.extras[idx][field] = parseFloat(inp.value) || 0;
       else cfg.extras[idx][field] = inp.value.trim();
     });
-    window.MudanzasCalc.saveConfig(cfg);
+    await executeConfigSave(cfg, 'extrasStatus', 'Servicios adicionales actualizados y guardados');
     renderDashboard();
-    showSaveStatus('extrasStatus');
-    showAdminToast('Servicios adicionales actualizados y guardados ✓', 'success');
   });
 }
 
 /* ── Password Change ── */
 function initPasswordChange() {
-  document.getElementById('savePassword').addEventListener('click', () => {
+  document.getElementById('savePassword').addEventListener('click', async () => {
     const current  = document.getElementById('currentPw').value;
     const newPw    = document.getElementById('newPw').value;
     const confirmPw= document.getElementById('confirmPw').value;
@@ -392,26 +409,58 @@ function initPasswordChange() {
       showAdminToast('Las contraseñas no coinciden', 'error'); return;
     }
     cfg.password = newPw;
-    window.MudanzasCalc.saveConfig(cfg);
+    await executeConfigSave(cfg, null, 'Contraseña actualizada');
     document.getElementById('currentPw').value = '';
     document.getElementById('newPw').value     = '';
     document.getElementById('confirmPw').value = '';
-    showAdminToast('Contraseña actualizada correctamente ✓', 'success');
   });
 }
 
 /* ── Reset Buttons ── */
 function initResetButtons() {
   document.querySelectorAll('[data-reset]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      if (!confirm('¿Restablecer todos los valores a los predeterminados? Esta acción no se puede deshacer.')) return;
-      window.MudanzasCalc.saveConfig(JSON.parse(JSON.stringify(window.MudanzasCalc.DEFAULT_CONFIG)));
+    btn.addEventListener('click', async () => {
+      if (!confirm('¿Restablecer todos los valores a los predeterminados? Esta acción se sincronizará con Firebase.')) return;
+      const def = JSON.parse(JSON.stringify(window.MudanzasCalc.DEFAULT_CONFIG));
+      await executeConfigSave(def, null, 'Configuración restablecida a valores por defecto');
       loadAllSettings();
       renderDashboard();
-      showAdminToast('Configuración restablecida ✓', 'success');
     });
   });
 }
+
+/* ── Realtime Firebase Sync Listeners ── */
+window.addEventListener('mudanzas:configUpdated', (e) => {
+  const badge = document.getElementById('firebaseStatusBadge');
+  const badgeText = document.getElementById('firebaseStatusText');
+  if (badge && badgeText) {
+    badge.style.background = 'rgba(16,185,129,.12)';
+    badge.style.borderColor = 'rgba(16,185,129,.3)';
+    badge.style.color = '#10b981';
+    badgeText.textContent = 'Firebase Conectado';
+  }
+
+  // Reload admin forms if open and user is not actively typing
+  const activeTag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
+  if (activeTag !== 'input' && activeTag !== 'textarea') {
+    const adminApp = document.getElementById('adminApp');
+    if (adminApp && adminApp.classList.contains('show')) {
+      loadAllSettings();
+      renderDashboard();
+    }
+  }
+});
+
+window.addEventListener('mudanzas:firestoreError', (e) => {
+  const badge = document.getElementById('firebaseStatusBadge');
+  const badgeText = document.getElementById('firebaseStatusText');
+  if (badge && badgeText) {
+    badge.style.background = 'rgba(239,68,68,.12)';
+    badge.style.borderColor = 'rgba(239,68,68,.3)';
+    badge.style.color = '#ef4444';
+    badgeText.textContent = 'Firebase: Error Reglas';
+  }
+});
 
 /* ── Save Status ── */
 function showSaveStatus(id) {
@@ -428,6 +477,7 @@ function showAdminToast(msg, type = 'success') {
   const icon = toast.querySelector('i');
   const text = toast.querySelector('span');
   if (type === 'success') { icon.className = 'fas fa-check-circle success-icon'; }
+  else if (type === 'warning') { icon.className = 'fas fa-exclamation-triangle'; icon.style.color = 'var(--warning)'; }
   else { icon.className = 'fas fa-exclamation-circle error-icon'; }
   text.textContent = msg;
   toast.className = `show ${type}`;

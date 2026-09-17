@@ -125,6 +125,14 @@ document.addEventListener('DOMContentLoaded', () => {
   initFAQ();
   initContactForm();
   loadContact();
+
+  // Listen for real-time Firestore config updates
+  window.addEventListener('mudanzas:configUpdated', () => {
+    loadContact();
+    renderUnitCards();
+    renderExtras();
+    updatePricePreview();
+  });
 });
 
 /* ── Theme Toggle (Claro / Oscuro) ── */
@@ -295,10 +303,11 @@ function renderUnitCards() {
   if (!container) return;
   container.innerHTML = '';
   cfg.units.filter(u => u.active).forEach(unit => {
+    const isSelected = quoteData.unitId === unit.id;
     const card = document.createElement('label');
-    card.className = 'unit-card';
+    card.className = 'unit-card' + (isSelected ? ' selected' : '');
     card.innerHTML = `
-      <input type="radio" name="unit" value="${unit.id}">
+      <input type="radio" name="unit" value="${unit.id}" ${isSelected ? 'checked' : ''}>
       <i class="fas ${unit.icon} unit-icon"></i>
       <div class="unit-info">
         <div class="unit-name">${unit.name}</div>
@@ -324,10 +333,11 @@ function renderExtras() {
   if (!container) return;
   container.innerHTML = '';
   cfg.extras.filter(extra => extra.active !== false).forEach(extra => {
+    const isChecked = quoteData.extraIds.includes(extra.id);
     const item = document.createElement('label');
-    item.className = 'extra-item';
+    item.className = 'extra-item' + (isChecked ? ' checked' : '');
     item.innerHTML = `
-      <input type="checkbox" value="${extra.id}">
+      <input type="checkbox" value="${extra.id}" ${isChecked ? 'checked' : ''}>
       <i class="fas ${extra.icon}" style="color:var(--red);flex-shrink:0"></i>
       <div class="extra-label">
         <strong>${extra.name}</strong>
@@ -338,7 +348,7 @@ function renderExtras() {
     item.querySelector('input').addEventListener('change', e => {
       item.classList.toggle('checked', e.target.checked);
       if (e.target.checked) {
-        quoteData.extraIds.push(extra.id);
+        if (!quoteData.extraIds.includes(extra.id)) quoteData.extraIds.push(extra.id);
       } else {
         quoteData.extraIds = quoteData.extraIds.filter(id => id !== extra.id);
       }

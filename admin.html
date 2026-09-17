@@ -98,6 +98,9 @@
     <div class="admin-topbar">
       <h1 id="panelTitle"><i class="fas fa-tachometer-alt"></i> Dashboard</h1>
       <div class="admin-topbar-actions">
+        <div id="firebaseStatusBadge" style="display:inline-flex;align-items:center;gap:.4rem;font-size:.78rem;padding:.3rem .75rem;border-radius:20px;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);color:#10b981;font-weight:600">
+          <i class="fas fa-bolt" style="font-size:.7rem"></i> <span id="firebaseStatusText">Firebase Conectado</span>
+        </div>
         <button class="theme-toggle-btn" id="themeToggleAdminBtn" type="button" aria-label="Cambiar tema claro/oscuro" title="Cambiar tema">
           <i class="fas fa-moon"></i>
         </button>
@@ -385,6 +388,9 @@
   <span></span>
 </div>
 
+<!-- Firebase SDK (Compat) -->
+<script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore-compat.js"></script>
 <script src="js/calculator.js"></script>
 <script src="js/admin.js"></script>
 </body>

@@ -36,6 +36,36 @@ const DEFAULT_CONFIG = {
   }
 };
 
+// Firebase Configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyBoRWG7gkmpQ3xSVZzvNFrtrpVXJA5IFM0",
+  authDomain: "fletes-la-14.firebaseapp.com",
+  projectId: "fletes-la-14",
+  storageBucket: "fletes-la-14.firebasestorage.app",
+  messagingSenderId: "967585648308",
+  appId: "1:967585648308:web:88d111e82459e2915611e1"
+};
+
+let db = null;
+let isFirestoreInitialized = false;
+
+function initFirebase() {
+  if (isFirestoreInitialized && db) return db;
+  try {
+    if (typeof firebase !== 'undefined') {
+      if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+      }
+      db = firebase.firestore();
+      isFirestoreInitialized = true;
+      return db;
+    }
+  } catch (err) {
+    console.warn('Firebase init warning:', err);
+  }
+  return null;
+}
+
 /**
  * Load config from localStorage or use defaults
  */
@@ -44,11 +74,6 @@ function getConfig() {
     const stored = localStorage.getItem('mudanzas14_config');
     if (stored) {
       const parsed = JSON.parse(stored);
-      // Si la versión en el código es más reciente, forzar actualización para todos los usuarios
-      if (!parsed.version || parsed.version < CONFIG_VERSION) {
-        saveConfig(DEFAULT_CONFIG);
-        return JSON.parse(JSON.stringify(DEFAULT_CONFIG));
-      }
       // Migrate legacy password if it was admin14
       if (parsed.password === 'admin14') {
         parsed.password = 'Pruebas1234';
@@ -71,7 +96,6 @@ function getConfig() {
           if (!u.icon) u.icon = 'fa-truck';
         });
       }
-      saveConfig(parsed);
       return parsed;
     }
   } catch (e) { /* ignore */ }
@@ -79,10 +103,63 @@ function getConfig() {
 }
 
 /**
- * Save config to localStorage
+ * Save config to localStorage and Firestore
  */
-function saveConfig(config) {
+async function saveConfig(config) {
+  // Always update local cache immediately
   localStorage.setItem('mudanzas14_config', JSON.stringify(config));
+
+  // Sync to Firestore if available
+  const firestore = initFirebase();
+  if (firestore) {
+    try {
+      await firestore.collection('settings').doc('config').set(config);
+      return { success: true, cloud: true };
+    } catch (err) {
+      console.error('Error saving to Firestore:', err);
+      return { success: false, cloud: false, error: err };
+    }
+  }
+  return { success: true, cloud: false };
+}
+
+/**
+ * Listen in real time to Firestore config updates
+ */
+function listenToFirestore(onUpdate) {
+  const firestore = initFirebase();
+  if (!firestore) return;
+
+  const docRef = firestore.collection('settings').doc('config');
+  docRef.onSnapshot((doc) => {
+    if (doc.exists) {
+      const remoteConfig = doc.data();
+      if (remoteConfig && typeof remoteConfig === 'object') {
+        localStorage.setItem('mudanzas14_config', JSON.stringify(remoteConfig));
+        window.dispatchEvent(new CustomEvent('mudanzas:configUpdated', { detail: remoteConfig }));
+        if (typeof onUpdate === 'function') onUpdate(remoteConfig);
+      }
+    } else {
+      // First time initialization: seed Firestore with default config
+      console.log('Seeding initial config into Firestore...');
+      const initial = getConfig();
+      docRef.set(initial).catch(err => {
+        console.warn('Could not seed initial config to Firestore:', err);
+      });
+    }
+  }, (error) => {
+    console.warn('Firestore onSnapshot error:', error);
+    window.dispatchEvent(new CustomEvent('mudanzas:firestoreError', { detail: error }));
+  });
+}
+
+// Auto-start listener once DOM is ready or script loads
+if (typeof window !== 'undefined') {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => listenToFirestore());
+  } else {
+    listenToFirestore();
+  }
 }
 
 /**
@@ -149,4 +226,4 @@ function formatMXN(amount) {
 }
 
 // Export to global scope
-window.MudanzasCalc = { getConfig, saveConfig, calculateQuote, formatMXN, DEFAULT_CONFIG };
+window.MudanzasCalc = { getConfig, saveConfig, calculateQuote, formatMXN, DEFAULT_CONFIG, initFirebase, listenToFirestore, firebaseConfig };
