@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel Admin — Mudanzas D'La 14</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     LOGIN SCREEN
+══════════════════════════════════════ -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo-text">MUDANZAS <span class="red">D'LA 14</span></div>
+      <div class="login-logo-sub">Panel de Administración</div>
+    </div>
+    <div class="login-title"><i class="fas fa-lock" style="color:var(--red);margin-right:.4rem"></i> Acceso Restringido</div>
+
+    <div class="form-group">
+      <label>Contraseña</label>
+      <div class="password-wrap">
+        <input class="form-control" id="loginPassword" type="password" placeholder="••••••••" autocomplete="current-password">
+        <button class="password-toggle" id="pwToggle" type="button" aria-label="Mostrar contraseña">
+          <i class="fas fa-eye"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="login-error" id="loginError">
+      <i class="fas fa-exclamation-circle"></i> Contraseña incorrecta. Inténtalo de nuevo.
+    </div>
+
+    <button class="btn-login" id="loginBtn">
+      <i class="fas fa-sign-in-alt"></i> Ingresar al Panel
+    </button>
+
+    <a class="login-back" href="index.html">
+      <i class="fas fa-arrow-left"></i> Volver al sitio principal
+    </a>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     ADMIN APP
+══════════════════════════════════════ -->
+<div id="adminApp">
+
+  <!-- Sidebar -->
+  <aside class="admin-sidebar" id="adminSidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">MUDANZAS <span class="red">D'LA 14</span></div>
+      <div class="sidebar-logo-sub">Panel de Control</div>
+      <span class="sidebar-badge"><i class="fas fa-lock"></i> Admin</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="sidebar-nav-section">Principal</div>
+      <button class="sidebar-link active" data-panel="dashboard" data-icon="fa-tachometer-alt">
+        <i class="fas fa-tachometer-alt"></i> Dashboard
+      </button>
+
+      <div class="sidebar-nav-section">Configuración</div>
+      <button class="sidebar-link" data-panel="units" data-icon="fa-truck">
+        <i class="fas fa-truck"></i> Unidades y Tarifas
+      </button>
+      <button class="sidebar-link" data-panel="extras" data-icon="fa-plus-circle">
+        <i class="fas fa-plus-circle"></i> Servicios Adicionales
+      </button>
+      <button class="sidebar-link" data-panel="distances" data-icon="fa-road">
+        <i class="fas fa-road"></i> Rangos de Distancia
+      </button>
+      <button class="sidebar-link" data-panel="contact" data-icon="fa-address-book">
+        <i class="fas fa-address-book"></i> Información de Contacto
+      </button>
+
+      <div class="sidebar-nav-section">Seguridad</div>
+      <button class="sidebar-link" data-panel="password" data-icon="fa-key">
+        <i class="fas fa-key"></i> Cambiar Contraseña
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="btn-logout" id="logoutBtn">
+        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="admin-main">
+    <!-- Topbar -->
+    <div class="admin-topbar">
+      <h1 id="panelTitle"><i class="fas fa-tachometer-alt"></i> Dashboard</h1>
+      <div class="admin-topbar-actions">
+        <button class="theme-toggle-btn" id="themeToggleAdminBtn" type="button" aria-label="Cambiar tema claro/oscuro" title="Cambiar tema">
+          <i class="fas fa-moon"></i>
+        </button>
+        <span class="admin-topbar-time" id="adminClock">00:00</span>
+        <a href="index.html" target="_blank" class="btn-save" style="padding:.5rem 1rem;font-size:.8rem;text-decoration:none">
+          <i class="fas fa-external-link-alt"></i> Ver Sitio
+        </a>
+      </div>
+    </div>
+
+    <div class="admin-content">
+
+      <!-- ── DASHBOARD ── -->
+      <div class="admin-panel active" id="panelDashboard">
+        <div class="dash-grid">
+          <div class="dash-card">
+            <div class="dash-card-icon"><i class="fas fa-truck"></i></div>
+            <div class="dash-card-info">
+              <h4>Unidades Activas</h4>
+              <div class="value red" id="dashUnits">—</div>
+            </div>
+          </div>
+          <div class="dash-card">
+            <div class="dash-card-icon"><i class="fas fa-dollar-sign"></i></div>
+            <div class="dash-card-info">
+              <h4>Precio Mínimo</h4>
+              <div class="value" id="dashMinPrice">—</div>
+            </div>
+          </div>
+          <div class="dash-card">
+            <div class="dash-card-icon"><i class="fas fa-list-check"></i></div>
+            <div class="dash-card-info">
+              <h4>Extras Disponibles</h4>
+              <div class="value" id="dashExtras">—</div>
+            </div>
+          </div>
+          <div class="dash-card">
+            <div class="dash-card-icon"><i class="fas fa-phone"></i></div>
+            <div class="dash-card-info">
+              <h4>Teléfono Actual</h4>
+              <div class="value" style="font-size:1rem" id="dashContact">—</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-card" style="margin-top:0">
+          <h3><i class="fas fa-info-circle"></i> Bienvenido al Panel de Administración</h3>
+          <p style="color:var(--gray);font-size:.9rem;line-height:1.7;margin-bottom:1rem">
+            Desde aquí puedes modificar todos los parámetros de precio y configuración del cotizador público sin necesidad de editar código. Los cambios se guardan automáticamente en el navegador.
+          </p>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:.75rem">
+            <div style="padding:1rem;background:var(--black);border-radius:var(--radius);border:1px solid var(--black3)">
+              <div style="color:var(--red);font-size:1.2rem;margin-bottom:.4rem"><i class="fas fa-truck"></i></div>
+              <strong style="font-family:var(--font-head);font-size:.85rem;text-transform:uppercase">Unidades</strong>
+              <p style="font-size:.78rem;color:var(--gray-dark);margin-top:.25rem">Modifica precio base, costo por km y activa/desactiva unidades.</p>
+            </div>
+            <div style="padding:1rem;background:var(--black);border-radius:var(--radius);border:1px solid var(--black3)">
+              <div style="color:var(--red);font-size:1.2rem;margin-bottom:.4rem"><i class="fas fa-road"></i></div>
+              <strong style="font-family:var(--font-head);font-size:.85rem;text-transform:uppercase">Distancias</strong>
+              <p style="font-size:.78rem;color:var(--gray-dark);margin-top:.25rem">Define rangos local/foráneo y multiplicadores de precio por distancia.</p>
+            </div>
+            <div style="padding:1rem;background:var(--black);border-radius:var(--radius);border:1px solid var(--black3)">
+              <div style="color:var(--red);font-size:1.2rem;margin-bottom:.4rem"><i class="fas fa-plus-circle"></i></div>
+              <strong style="font-family:var(--font-head);font-size:.85rem;text-transform:uppercase">Extras</strong>
+              <p style="font-size:.78rem;color:var(--gray-dark);margin-top:.25rem">Ajusta el costo de embalaje, maniobras, seguro y otros servicios.</p>
+            </div>
+            <div style="padding:1rem;background:var(--black);border-radius:var(--radius);border:1px solid var(--black3)">
+              <div style="color:var(--red);font-size:1.2rem;margin-bottom:.4rem"><i class="fas fa-address-book"></i></div>
+              <strong style="font-family:var(--font-head);font-size:.85rem;text-transform:uppercase">Contacto</strong>
+              <p style="font-size:.78rem;color:var(--gray-dark);margin-top:.25rem">Actualiza teléfono, WhatsApp, email y horarios de atención.</p>
+            </div>
+          </div>
+          <div style="margin-top:1.25rem;padding:.85rem 1rem;background:rgba(225,29,29,.08);border:1px solid rgba(225,29,29,.25);border-radius:var(--radius);font-size:.82rem;color:var(--gray)">
+            <i class="fas fa-info-circle" style="color:var(--red)"></i>
+            <strong>Contraseña por defecto:</strong> <code style="background:var(--black);padding:.15rem .4rem;border-radius:4px;color:var(--red)">Pruebas1234</code> — Cámbiala en la sección "Cambiar Contraseña" por seguridad.
+          </div>
+        </div>
+      </div>
+
+      <!-- ── UNITS ── -->
+      <div class="admin-panel" id="panelUnits">
+        <div class="settings-card full">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:.75rem">
+            <div>
+              <h3><i class="fas fa-truck"></i> Unidades y Tarifas</h3>
+              <p style="color:var(--gray-dark);font-size:.85rem;margin-top:.3rem">Modifica nombre, capacidad, precio base, costo por km, activa/oculta o elimina unidades.</p>
+            </div>
+            <button type="button" class="btn-save" id="btnAddUnit" style="padding:.5rem 1rem;font-size:.82rem">
+              <i class="fas fa-plus"></i> Nueva Unidad
+            </button>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="units-table">
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Capacidad / Descripción</th>
+                  <th>Precio Base (MXN)</th>
+                  <th>Por Km (MXN)</th>
+                  <th>Visible</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="unitsTableBody">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+          <div class="save-bar">
+            <span class="save-status" id="unitsStatus"><i class="fas fa-check-circle"></i> Guardado</span>
+            <button class="btn-reset" data-reset="units"><i class="fas fa-undo"></i> Restablecer</button>
+            <button class="btn-save" id="saveUnits"><i class="fas fa-save"></i> Guardar Cambios</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── EXTRAS ── -->
+      <div class="admin-panel" id="panelExtras">
+        <div class="settings-card full">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:.75rem">
+            <div>
+              <h3><i class="fas fa-plus-circle"></i> Servicios Adicionales</h3>
+              <p style="color:var(--gray-dark);font-size:.85rem;margin-top:.3rem">Agrega, quita, renombra, oculta o cambia el precio de los servicios que el cliente puede contratar.</p>
+            </div>
+            <button type="button" class="btn-save" id="btnAddExtra" style="padding:.5rem 1rem;font-size:.82rem">
+              <i class="fas fa-plus"></i> Nuevo Servicio
+            </button>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="units-table">
+              <thead>
+                <tr>
+                  <th>Servicio</th>
+                  <th>Descripción</th>
+                  <th>Precio (MXN)</th>
+                  <th>Visible</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="extrasTableBody">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+          <div class="save-bar">
+            <span class="save-status" id="extrasStatus"><i class="fas fa-check-circle"></i> Guardado</span>
+            <button class="btn-reset" data-reset="extras"><i class="fas fa-undo"></i> Restablecer</button>
+            <button class="btn-save" id="saveExtras"><i class="fas fa-save"></i> Guardar Cambios</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── DISTANCES ── -->
+      <div class="admin-panel" id="panelDistances">
+        <div class="settings-grid">
+          <div class="settings-card">
+            <h3><i class="fas fa-road"></i> Rangos de Distancia (km)</h3>
+            <div class="form-group">
+              <label>Local — Máximo (km)</label>
+              <input class="form-control" id="localMax" type="number" min="1" placeholder="30">
+              <div class="form-note">Viajes ≤ este km se consideran locales</div>
+            </div>
+            <div class="form-group">
+              <label>Foráneo — Máximo (km)</label>
+              <input class="form-control" id="foraneoMax" type="number" min="1" placeholder="150">
+              <div class="form-note">Entre Local y este km = Foráneo</div>
+            </div>
+            <p style="font-size:.78rem;color:var(--gray-dark)">* Largo recorrido: cualquier distancia mayor al máximo foráneo</p>
+          </div>
+          <div class="settings-card">
+            <h3><i class="fas fa-percentage"></i> Multiplicadores de Precio</h3>
+            <div class="form-group">
+              <label>Multiplicador Local</label>
+              <input class="form-control" id="localMult" type="number" step="0.01" min="1" placeholder="1.00">
+              <div class="form-note">Ej: 1.00 = sin recargo adicional</div>
+            </div>
+            <div class="form-group">
+              <label>Multiplicador Foráneo</label>
+              <input class="form-control" id="foraneoMult" type="number" step="0.01" min="1" placeholder="1.15">
+              <div class="form-note">Ej: 1.15 = +15% sobre el costo por km</div>
+            </div>
+            <div class="form-group">
+              <label>Multiplicador Largo Recorrido</label>
+              <input class="form-control" id="largoMult" type="number" step="0.01" min="1" placeholder="1.25">
+              <div class="form-note">Ej: 1.25 = +25% sobre el costo por km</div>
+            </div>
+          </div>
+          <div class="settings-card full">
+            <div class="save-bar" style="border-top:none;padding-top:0;margin-top:0">
+              <span class="save-status" id="distancesStatus"><i class="fas fa-check-circle"></i> Guardado</span>
+              <button class="btn-reset" data-reset="distances"><i class="fas fa-undo"></i> Restablecer</button>
+              <button class="btn-save" id="saveDistances"><i class="fas fa-save"></i> Guardar Cambios</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── CONTACT ── -->
+      <div class="admin-panel" id="panelContact">
+        <div class="settings-grid">
+          <div class="settings-card">
+            <h3><i class="fas fa-phone"></i> Datos de Contacto</h3>
+            <div class="form-group">
+              <label>Teléfono</label>
+              <input class="form-control" id="adminPhone" type="text" placeholder="(999) 123-4567">
+            </div>
+            <div class="form-group">
+              <label>Correo Electrónico</label>
+              <input class="form-control" id="adminEmail" type="email" placeholder="contacto@mudanzasdla14.com">
+            </div>
+            <div class="form-group">
+              <label>Horario de Atención</label>
+              <input class="form-control" id="adminHours" type="text" placeholder="Lun–Sáb 7:00am – 8:00pm">
+            </div>
+            <div class="form-group">
+              <label>Dirección / Ciudad</label>
+              <input class="form-control" id="adminAddress" type="text" placeholder="Puebla, Puebla, México">
+            </div>
+          </div>
+          <div class="settings-card">
+            <h3><i class="fab fa-whatsapp"></i> WhatsApp</h3>
+            <div class="form-group">
+              <label>Número de WhatsApp</label>
+              <div class="prefix">
+                <span>+</span>
+                <input class="form-control" id="adminWhatsapp" type="text" placeholder="5219991234567">
+              </div>
+              <div class="form-note">Ingresa el número completo con código de país (sin + ni espacios). Ej: 5219991234567</div>
+            </div>
+            <div style="margin-top:1rem;padding:.85rem 1rem;background:rgba(37,211,102,.08);border:1px solid rgba(37,211,102,.25);border-radius:var(--radius);font-size:.82rem;color:var(--gray)">
+              <i class="fab fa-whatsapp" style="color:#25d366"></i>
+              Este número se usa para el botón flotante de WhatsApp, el botón "Confirmar por WhatsApp" de la cotización y el formulario de contacto.
+            </div>
+          </div>
+          <div class="settings-card full">
+            <div class="save-bar" style="border-top:none;padding-top:0;margin-top:0">
+              <span class="save-status" id="contactStatus"><i class="fas fa-check-circle"></i> Guardado</span>
+              <button class="btn-reset" data-reset="contact"><i class="fas fa-undo"></i> Restablecer</button>
+              <button class="btn-save" id="saveContact"><i class="fas fa-save"></i> Guardar Cambios</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PASSWORD ── -->
+      <div class="admin-panel" id="panelPassword">
+        <div class="settings-card change-pw-card">
+          <h3><i class="fas fa-key"></i> Cambiar Contraseña</h3>
+          <div class="form-group">
+            <label>Contraseña Actual</label>
+            <div class="password-wrap">
+              <input class="form-control" id="currentPw" type="password" placeholder="Contraseña actual">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Nueva Contraseña</label>
+            <div class="password-wrap">
+              <input class="form-control" id="newPw" type="password" placeholder="Mínimo 4 caracteres">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Confirmar Nueva Contraseña</label>
+            <div class="password-wrap">
+              <input class="form-control" id="confirmPw" type="password" placeholder="Repite la nueva contraseña">
+            </div>
+          </div>
+          <div style="padding:.75rem 1rem;background:rgba(217,119,6,.08);border:1px solid rgba(217,119,6,.3);border-radius:var(--radius);font-size:.82rem;color:var(--gray);margin-bottom:1rem">
+            <i class="fas fa-exclamation-triangle" style="color:var(--warning)"></i>
+            La contraseña se guarda en el navegador. Si borras los datos del navegador, se restablece a <code style="background:var(--black);padding:.1rem .35rem;border-radius:3px;color:var(--red)">Pruebas1234</code>.
+          </div>
+          <button class="btn-save" id="savePassword" style="width:100%">
+            <i class="fas fa-key"></i> Actualizar Contraseña
+          </button>
+        </div>
+      </div>
+
+    </div><!-- /admin-content -->
+  </main><!-- /admin-main -->
+
+</div><!-- /adminApp -->
+
+<!-- Toast -->
+<div id="adminToast">
+  <i class="fas fa-check-circle success-icon"></i>
+  <span></span>
+</div>
+
+<script src="js/calculator.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

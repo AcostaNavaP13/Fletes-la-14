@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Mudanzas D'La 14 — Cotiza tu mudanza o flete en minutos. El mejor servicio al mejor precio. Sin registro requerido.">
+  <title>Mudanzas D'La 14 — Cotiza tu Mudanza</title>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;1,700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- jsPDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- Leaflet.js (Maps - OpenStreetMap, gratis) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     NAVBAR
+══════════════════════════════════════ -->
+<nav class="navbar">
+  <div class="container">
+    <a class="navbar-brand" href="#inicio" data-tab="inicio">
+      <i class="fas fa-truck-moving navbar-icon"></i>
+      <div class="navbar-logo-text">
+        MUDANZAS <span class="d14">D'LA 14</span>
+        <span class="sub">El mejor servicio al mejor precio</span>
+      </div>
+    </a>
+    <div class="navbar-links">
+      <a href="#inicio" data-tab="inicio" class="active">Inicio</a>
+      <a href="#cotizador" data-tab="cotizador">Cotizar</a>
+      <a href="#servicios" data-tab="servicios">Servicios</a>
+      <a href="#por-que" data-tab="por-que">¿Por qué Nosotros?</a>
+      <a href="#faq" data-tab="faq">FAQ</a>
+      <a href="#contacto" data-tab="contacto">Contacto</a>
+      <button class="theme-toggle-btn" id="themeToggleBtn" type="button" aria-label="Cambiar tema claro/oscuro" title="Cambiar tema">
+        <i class="fas fa-moon"></i>
+      </button>
+      <a href="admin.html" class="btn btn-secondary navbar-cta" style="margin-left:.5rem"><i class="fas fa-lock"></i> Admin</a>
+    </div>
+    <div style="display:flex;align-items:center;gap:.75rem">
+      <button class="theme-toggle-btn mobile-theme-btn" id="themeToggleMobileBtn" type="button" aria-label="Cambiar tema" style="display:none">
+        <i class="fas fa-moon"></i>
+      </button>
+      <button class="hamburger" id="hamburger" aria-label="Menú">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#inicio" data-tab="inicio">Inicio</a>
+    <a href="#cotizador" data-tab="cotizador">Cotizar</a>
+    <a href="#servicios" data-tab="servicios">Servicios</a>
+    <a href="#por-que" data-tab="por-que">¿Por qué Nosotros?</a>
+    <a href="#faq" data-tab="faq">Preguntas Frecuentes</a>
+    <a href="#contacto" data-tab="contacto">Contacto</a>
+    <a href="admin.html">Panel Admin</a>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════
+     TAB 1: INICIO
+══════════════════════════════════════ -->
+<div class="view-tab-pane active" id="tab-inicio">
+  <section class="hero" id="inicio">
+    <div class="hero-bg"></div>
+    <div class="hero-stripe"></div>
+    <div class="container">
+      <div class="hero-content">
+        <div class="hero-eyebrow">Fletes &amp; Mudanzas — Puebla, Puebla</div>
+        <h1 class="hero-title">
+          Tu Mudanza<br>
+          <span class="accent">Fácil, Segura<br>y al Mejor Precio</span>
+        </h1>
+        <p class="hero-subtitle">
+          Cotiza en minutos, sin registro. Servicio profesional con unidades modernas y personal capacitado para cuidar tus pertenencias.
+        </p>
+        <div class="hero-actions">
+          <button class="btn btn-primary" data-tab-nav="cotizador">
+            <i class="fas fa-calculator"></i> Cotizar Ahora — Es Gratis
+          </button>
+          <a class="btn btn-outline-white" id="waBtn" href="#" target="_blank">
+            <i class="fab fa-whatsapp"></i> WhatsApp Directo
+          </a>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <div class="number">500+</div>
+            <div class="label">Mudanzas realizadas</div>
+          </div>
+          <div class="hero-stat-divider"></div>
+          <div class="hero-stat">
+            <div class="number">5★</div>
+            <div class="label">Calificación Google</div>
+          </div>
+          <div class="hero-stat-divider"></div>
+          <div class="hero-stat">
+            <div class="number">10+</div>
+            <div class="label">Años de experiencia</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-image-panel" aria-hidden="true">
+      <i class="fas fa-truck-moving hero-truck-icon"></i>
+    </div>
+  </section>
+
+  <!-- Benefits Strip -->
+  <div class="benefits-strip" aria-hidden="true">
+    <div class="benefits-strip-inner">
+      <span><i class="fas fa-shield-alt"></i> Servicio Garantizado</span>
+      <span><i class="fas fa-clock"></i> Puntualidad</span>
+      <span><i class="fas fa-map-marker-alt"></i> Cobertura Local y Foránea</span>
+      <span><i class="fas fa-truck-moving"></i> Unidades Modernas</span>
+      <span><i class="fas fa-users"></i> Personal Capacitado</span>
+      <span><i class="fas fa-file-invoice-dollar"></i> Cotización Sin Registro</span>
+      <span><i class="fas fa-shield-alt"></i> Servicio Garantizado</span>
+      <span><i class="fas fa-clock"></i> Puntualidad</span>
+      <span><i class="fas fa-map-marker-alt"></i> Cobertura Local y Foránea</span>
+      <span><i class="fas fa-truck-moving"></i> Unidades Modernas</span>
+      <span><i class="fas fa-users"></i> Personal Capacitado</span>
+      <span><i class="fas fa-file-invoice-dollar"></i> Cotización Sin Registro</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     TAB 2: COTIZADOR
+══════════════════════════════════════ -->
+<div class="view-tab-pane" id="tab-cotizador">
+  <section id="cotizador">
+  <div class="container">
+    <div class="quote-wrapper">
+
+      <!-- Left: info -->
+      <div class="quote-info">
+        <span class="tag">Cotizador en Línea</span>
+        <h2 class="section-title mt-2">Obtén tu <span>Cotización</span> al Instante</h2>
+        <p>Sin registro, sin compromisos. Ingresa los datos de tu mudanza y obtén un estimado inmediato con desglose completo de costos.</p>
+        <div class="quote-highlights">
+          <div class="q-highlight">
+            <i class="fas fa-bolt"></i>
+            <div>
+              <strong>Cotización Instantánea</strong>
+              <span>Resultado en tiempo real mientras llenas el formulario</span>
+            </div>
+          </div>
+          <div class="q-highlight">
+            <i class="fas fa-file-pdf"></i>
+            <div>
+              <strong>PDF Descargable</strong>
+              <span>Descarga tu cotización firmada para comparar</span>
+            </div>
+          </div>
+          <div class="q-highlight">
+            <i class="fab fa-whatsapp"></i>
+            <div>
+              <strong>Confirmación por WhatsApp</strong>
+              <span>Envía tu solicitud directamente a nuestro equipo</span>
+            </div>
+          </div>
+          <div class="q-highlight">
+            <i class="fas fa-couch"></i>
+            <div>
+              <strong>Inventario Preliminar</strong>
+              <span>Agrega tus muebles por habitación para mayor precisión</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: form card -->
+      <div>
+        <!-- Price Preview -->
+        <div class="price-preview">
+          <div class="price-preview-title"><i class="fas fa-calculator" style="color:var(--red)"></i> Estimado actual</div>
+          <div class="price-preview-amount">
+            <span id="priceAmount">$0</span>
+            <small>MXN con IVA</small>
+          </div>
+          <div class="price-breakdown" id="priceBreakdown">
+            <div class="price-line">
+              <span class="price-label"><i class="fas fa-info-circle"></i> Selecciona una unidad para ver el desglose</span>
+              <span>—</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quote Card -->
+        <div class="quote-card" id="quoteCard">
+          <h3><i class="fas fa-truck-moving"></i> Solicitar Cotización</h3>
+
+          <!-- Step navigation -->
+          <div class="steps-nav">
+            <button class="step-btn active" data-step="1"><span class="step-num">1</span><span>Ruta</span></button>
+            <button class="step-btn" data-step="2"><span class="step-num">2</span><span>Unidad</span></button>
+            <button class="step-btn" data-step="3"><span class="step-num">3</span><span>Extras</span></button>
+            <button class="step-btn" data-step="4"><span class="step-num">4</span><span>Muebles</span></button>
+            <button class="step-btn" data-step="5"><span class="step-num">5</span><span>Confirmar</span></button>
+          </div>
+
+          <form id="quoteForm" novalidate>
+
+            <!-- STEP 1: Ruta -->
+            <div class="form-step active" id="step1">
+
+              <!-- Manual mode banner -->
+              <div class="manual-address-banner" id="manualAddressNotice" style="display:none">
+                <i class="fas fa-exclamation-triangle"></i>
+                <div>
+                  <strong>Coloca tu dirección completa</strong>
+                  <div style="font-size:0.77rem;color:var(--gray);margin-top:2px;">
+                    En modo manual, escribe calle, número, colonia y referencias. Ajusta los kilómetros abajo.
+                  </div>
+                </div>
+              </div>
+
+              <!-- Origin autocomplete -->
+              <div class="form-group autocomplete-group">
+                <label for="origen">
+                  <i class="fas fa-map-marker-alt" style="color:var(--red)"></i>
+                  Dirección de Origen <span class="required">*</span>
+                </label>
+                <div class="autocomplete-wrap">
+                  <input class="form-control" id="origen" name="origen" type="text"
+                    placeholder="Escribe tu dirección de origen..." autocomplete="off" required>
+                  <ul class="autocomplete-list" id="origenList"></ul>
+                </div>
+                <div class="addr-coords" id="origenCoords" style="display:none">
+                  <i class="fas fa-check-circle" style="color:var(--success)"></i>
+                  <span id="origenCoordsText"></span>
+                </div>
+              </div>
+
+              <!-- Destination autocomplete -->
+              <div class="form-group autocomplete-group">
+                <label for="destino">
+                  <i class="fas fa-flag-checkered" style="color:var(--red)"></i>
+                  Dirección de Destino <span class="required">*</span>
+                </label>
+                <div class="autocomplete-wrap">
+                  <input class="form-control" id="destino" name="destino" type="text"
+                    placeholder="Escribe tu dirección de destino..." autocomplete="off" required>
+                  <ul class="autocomplete-list" id="destinoList"></ul>
+                </div>
+                <div class="addr-coords" id="destinoCoords" style="display:none">
+                  <i class="fas fa-check-circle" style="color:var(--success)"></i>
+                  <span id="destinoCoordsText"></span>
+                </div>
+              </div>
+
+              <!-- Route info badge -->
+              <div class="route-info" id="routeInfo" style="display:none">
+                <div class="route-badge">
+                  <i class="fas fa-route"></i>
+                  <span>Distancia real por carretera:</span>
+                  <strong id="routeKmText">— km</strong>
+                </div>
+                <div class="route-badge route-badge-time">
+                  <i class="fas fa-clock"></i>
+                  <span>Tiempo estimado:</span>
+                  <strong id="routeTimeText">—</strong>
+                </div>
+              </div>
+
+              <!-- Calculating spinner -->
+              <div class="route-calculating" id="routeCalc" style="display:none">
+                <i class="fas fa-spinner fa-spin" style="color:var(--red)"></i>
+                <span>Calculando ruta por carretera...</span>
+              </div>
+
+              <!-- Route error -->
+              <div class="route-error" id="routeError" style="display:none">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span id="routeErrorText">No se pudo calcular la ruta. Puedes ajustar la distancia manualmente.</span>
+              </div>
+
+              <!-- Map -->
+              <div class="map-wrapper" id="mapWrapper">
+                <div id="routeMap"></div>
+                <div class="map-legend">
+                  <span><i class="fas fa-circle" style="color:#e11d1d;font-size:.6rem"></i> Origen (arrastra el pin)</span>
+                  <span><i class="fas fa-circle" style="color:#16a34a;font-size:.6rem"></i> Destino (arrastra el pin)</span>
+                  <span style="color:var(--gray-dark);font-size:.7rem;margin-left:auto">OpenStreetMap · Arrastra para ajuste exacto</span>
+                </div>
+              </div>
+
+              <!-- Manual km override -->
+              <div class="form-group mt-2">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.35rem;flex-wrap:wrap;gap:.4rem;">
+                  <label style="margin-bottom:0">
+                    Distancia: <span id="kmDisplay" style="color:var(--red);font-weight:700">50 km</span>
+                    <span id="kmSourceBadge" class="km-source-badge">manual</span>
+                  </label>
+                  <button type="button" id="btnToggleManualKm" class="btn-toggle-manual" style="display:none">
+                    <i class="fas fa-edit"></i> Cambiar a manual
+                  </button>
+                </div>
+                <div class="km-control">
+                  <input class="km-slider" type="range" id="kmSlider" min="1" max="1500" value="50">
+                  <span class="km-value" id="kmValue" contenteditable="true">50</span>
+                </div>
+                <div id="kmLockNotice" style="display:none;font-size:.76rem;color:var(--gray-dark);margin-top:.35rem;">
+                  <i class="fas fa-lock" style="color:var(--success)"></i> Distancia bloqueada por ruta del mapa. Haz clic en "Cambiar a manual" si deseas personalizar los km.
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:.72rem;color:var(--gray-dark);margin-top:.3rem">
+                  <span>1 km</span><span>750 km</span><span>1,500 km</span>
+                </div>
+              </div>
+
+              <!-- Date + service type -->
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="fechaMudanza"><i class="fas fa-calendar-alt" style="color:var(--red)"></i> Fecha aproximada</label>
+                  <input class="form-control" id="fechaMudanza" name="fechaMudanza" type="date">
+                </div>
+                <div class="form-group">
+                  <label for="tipoServicio"><i class="fas fa-concierge-bell" style="color:var(--red)"></i> Tipo de servicio</label>
+                  <select class="form-control" id="tipoServicio" name="tipoServicio">
+                    <option value="local">🏙 Mudanza local</option>
+                    <option value="foraneo">🛣 Mudanza foránea</option>
+                    <option value="flete">📦 Solo flete</option>
+                    <option value="compartida">🔄 Mudanza compartida</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="step-actions">
+                <span></span>
+                <button type="button" class="btn btn-primary" data-next="2">
+                  Siguiente <i class="fas fa-arrow-right"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- STEP 2: Unidad -->
+
+            <div class="form-step" id="step2">
+              <p style="font-size:.88rem;color:var(--gray-dark);margin-bottom:1rem">Selecciona el tipo de unidad según el volumen de tu mudanza. El precio se calcula automáticamente.</p>
+              <div class="unit-grid" id="unitGrid">
+                <!-- Rendered by JS -->
+              </div>
+              <div class="step-actions">
+                <button type="button" class="btn btn-secondary" data-prev="1"><i class="fas fa-arrow-left"></i> Anterior</button>
+                <button type="button" class="btn btn-primary" data-next="3">Siguiente <i class="fas fa-arrow-right"></i></button>
+              </div>
+            </div>
+
+            <!-- STEP 3: Extras -->
+            <div class="form-step" id="step3">
+              <p style="font-size:.88rem;color:var(--gray-dark);margin-bottom:1rem">Agrega servicios adicionales para una mudanza más completa. <strong>Todos son opcionales.</strong></p>
+              <div class="extras-grid" id="extrasGrid">
+                <!-- Rendered by JS -->
+              </div>
+              <div class="step-actions">
+                <button type="button" class="btn btn-secondary" data-prev="2"><i class="fas fa-arrow-left"></i> Anterior</button>
+                <button type="button" class="btn btn-primary" data-next="4">Siguiente <i class="fas fa-arrow-right"></i></button>
+              </div>
+            </div>
+
+            <!-- STEP 4: Inventario de Muebles -->
+            <div class="form-step" id="step4">
+              <div class="furniture-section">
+                <h4><i class="fas fa-couch"></i> Inventario Preliminar de Muebles</h4>
+                <p style="font-size:.82rem;color:var(--gray-dark);margin-bottom:.85rem">Indica cuántos artículos de cada tipo vas a mover. Esto ayuda a confirmar el tamaño de unidad recomendada. <strong>Paso opcional pero útil.</strong></p>
+
+                <!-- Room Tabs — rendered by JS -->
+                <div class="room-tabs" id="roomTabs"></div>
+
+                <!-- Furniture Panels — rendered by JS -->
+                <div id="furniturePanels"></div>
+
+                <!-- Summary -->
+                <div class="furniture-summary" id="furnitureSummary" style="display:none">
+                  <i class="fas fa-check-circle"></i>
+                  <span><strong id="furnitureSummaryText">0 artículos registrados</strong> en el inventario preliminar</span>
+                </div>
+              </div>
+              <div class="step-actions">
+                <button type="button" class="btn btn-secondary" data-prev="3"><i class="fas fa-arrow-left"></i> Anterior</button>
+                <button type="button" class="btn btn-primary" data-next="5">Siguiente <i class="fas fa-arrow-right"></i></button>
+              </div>
+            </div>
+
+            <!-- STEP 5: Confirmar -->
+            <div class="form-step" id="step5">
+              <p style="font-size:.88rem;color:var(--gray-dark);margin-bottom:1rem">Ingresa tus datos de contacto para confirmar la cotización. <strong>No se requiere registro.</strong></p>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="clientName">Nombre <span class="required">*</span></label>
+                  <input class="form-control" id="clientName" name="clientName" type="text" placeholder="Tu nombre" required>
+                </div>
+                <div class="form-group">
+                  <label for="clientPhone">Teléfono <span class="required">*</span></label>
+                  <input class="form-control" id="clientPhone" name="clientPhone" type="tel" placeholder="222 123 4567" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="clientEmail">Correo electrónico <span style="color:var(--gray-dark)">(opcional)</span></label>
+                <input class="form-control" id="clientEmail" name="clientEmail" type="email" placeholder="tu@correo.com">
+              </div>
+              <div class="form-group">
+                <label for="clientNotes">Notas adicionales <span style="color:var(--gray-dark)">(opcional)</span></label>
+                <textarea class="form-control" id="clientNotes" name="clientNotes" rows="2" placeholder="Piso, acceso difícil, objetos especiales, etc."></textarea>
+              </div>
+              <div class="step-actions">
+                <button type="button" class="btn btn-secondary" data-prev="4"><i class="fas fa-arrow-left"></i> Anterior</button>
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-paper-plane"></i> Confirmar Cotización
+                </button>
+              </div>
+            </div>
+
+          </form>
+        </div><!-- /quote-card -->
+
+        <!-- Quote Result -->
+        <div id="quoteResult">
+          <div class="result-icon"><i class="fas fa-check-circle"></i></div>
+          <h3 class="result-title">¡Cotización Lista, <span id="resultName"></span>!</h3>
+          <div class="result-amount" id="resultAmount"></div>
+          <p class="result-disclaimer">
+            * Precio estimado con IVA incluido. El costo final puede variar según condiciones reales del servicio.<br>
+            Válida por <strong>48 horas</strong>.
+          </p>
+
+          <!-- Promo reseña Google -->
+          <div class="review-promo-box">
+            <div class="review-promo-icon"><i class="fab fa-google"></i></div>
+            <div class="review-promo-text">
+              <strong>¿Deseas un descuento extra en tu mudanza?</strong>
+              <p>Déjanos tu reseña o referencia en Google y comparte una captura por WhatsApp al confirmar tu servicio para aplicar una bonificación inmediata a tu cotización.</p>
+              <a href="https://g.page/r/CS4RBcHPgBYjEBM/review" target="_blank" rel="noopener" class="review-promo-link">
+                <i class="fas fa-star" style="color:#f59e0b"></i> Dejar mi reseña en Google <i class="fas fa-external-link-alt" style="font-size:0.72rem"></i>
+              </a>
+            </div>
+          </div>
+          <div class="result-actions">
+            <a class="btn btn-primary" id="resultWaBtn" href="#" target="_blank">
+              <i class="fab fa-whatsapp"></i> Confirmar por WhatsApp
+            </a>
+            <button class="btn btn-secondary" onclick="generatePDF()">
+              <i class="fas fa-file-pdf"></i> Descargar PDF
+            </button>
+            <button class="btn btn-outline-white" onclick="resetQuote()">
+              <i class="fas fa-redo"></i> Nueva Cotización
+            </button>
+          </div>
+        </div>
+
+      </div><!-- /right -->
+    </div><!-- /quote-wrapper -->
+  </div>
+  </section>
+</div>
+
+<!-- ══════════════════════════════════════
+     TAB 3: SERVICIOS
+══════════════════════════════════════ -->
+<div class="view-tab-pane" id="tab-servicios">
+  <section id="servicios">
+  <div class="container">
+    <span class="tag">Lo que Ofrecemos</span>
+    <h2 class="section-title mt-2">Nuestros <span>Servicios</span></h2>
+    <div class="services-grid">
+      <div class="service-card">
+        <div class="service-icon"><i class="fas fa-home"></i></div>
+        <h3>Mudanza Residencial</h3>
+        <p>Traslado completo de hogares con cuidado especial en cada pieza. Personal capacitado y materiales de embalaje incluidos opcionalmente.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon"><i class="fas fa-building"></i></div>
+        <h3>Mudanza Corporativa</h3>
+        <p>Cambio de oficinas, mobiliario, equipo de cómputo y archivo con mínima interrupción de tus operaciones comerciales.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon"><i class="fas fa-boxes"></i></div>
+        <h3>Flete de Mercancía</h3>
+        <p>Transporte de artículos grandes, maquinaria, electrodomésticos y objetos de valor con la unidad adecuada para cada carga.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon"><i class="fas fa-map-marked-alt"></i></div>
+        <h3>Servicio Foráneo</h3>
+        <p>Cobertura a nivel regional y nacional. Rutas foráneas con seguimiento y comunicación constante durante el traslado.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon"><i class="fas fa-box"></i></div>
+        <h3>Embalaje Profesional</h3>
+        <p>Protección adecuada de vajillas, espejos, electrónicos y arte. Usamos materiales de calidad para garantizar que todo llegue intacto.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon"><i class="fas fa-warehouse"></i></div>
+        <h3>Resguardo Temporal</h3>
+        <p>Bodega segura para guardar tus pertenencias entre mudanzas. Ideal cuando hay diferencia de fechas entre la salida y la entrada.</p>
+      </div>
+    </div>
+  </div>
+  </section>
+</div>
+
+<!-- ══════════════════════════════════════
+     TAB 4: POR QUÉ NOSOTROS
+══════════════════════════════════════ -->
+<div class="view-tab-pane" id="tab-por-que">
+  <section id="por-que">
+  <div class="container">
+    <span class="tag">Nuestras Ventajas</span>
+    <h2 class="section-title mt-2 center">¿Por qué <span>Elegirnos</span>?</h2>
+    <div class="whyus-grid">
+      <div class="whyus-card">
+        <div class="whyus-icon"><i class="fas fa-clock"></i></div>
+        <h4>Puntualidad Absoluta</h4>
+        <p>Llegamos en la fecha y hora acordadas. Respetamos tu tiempo y cumplimos con los horarios programados.</p>
+      </div>
+      <div class="whyus-card">
+        <div class="whyus-icon"><i class="fas fa-dollar-sign"></i></div>
+        <h4>Precios Claros</h4>
+        <p>Sin costos sorpresa. Tu cotización incluye desglose completo para que sepas exactamente qué estás pagando.</p>
+      </div>
+      <div class="whyus-card">
+        <div class="whyus-icon"><i class="fas fa-people-carry"></i></div>
+        <h4>Personal Capacitado</h4>
+        <p>Equipo experto en manejo y protección de muebles, maniobras en escaleras y estiba segura dentro del camión.</p>
+      </div>
+      <div class="whyus-card">
+        <div class="whyus-icon"><i class="fas fa-shield-alt"></i></div>
+        <h4>Tus Bienes Protegidos</h4>
+        <p>Seguro básico incluido en cada servicio con opción a cobertura ampliada para total tranquilidad.</p>
+      </div>
+      <div class="whyus-card">
+        <div class="whyus-icon"><i class="fas fa-trophy"></i></div>
+        <h4>10+ Años de Experiencia</h4>
+        <p>Más de una década realizando mudanzas con excelencia y cientos de clientes satisfechos en Puebla y todo México.</p>
+      </div>
+      <div class="whyus-card">
+        <div class="whyus-icon"><i class="fas fa-headset"></i></div>
+        <h4>Atención Personalizada</h4>
+        <p>Asesoría directa por WhatsApp antes, durante y después de tu mudanza. Siempre disponibles para ti.</p>
+      </div>
+      <div class="whyus-card">
+        <div class="whyus-icon"><i class="fas fa-truck-moving"></i></div>
+        <h4>Flotilla Moderna</h4>
+        <p>Unidades de diferentes capacidades en perfectas condiciones mecánicas para garantizar un traslado seguro.</p>
+      </div>
+      <div class="whyus-card">
+        <div class="whyus-icon"><i class="fas fa-star"></i></div>
+        <h4>5 Estrellas en Google</h4>
+        <p>Calificación máxima avalada por nuestros clientes reales. Escanea el QR en nuestra tarjeta para leer reseñas.</p>
+      </div>
+    </div>
+  </div>
+  </section>
+</div>
+
+<!-- ══════════════════════════════════════
+     TAB 5: FAQ
+══════════════════════════════════════ -->
+<div class="view-tab-pane" id="tab-faq">
+  <section id="faq">
+  <div class="container">
+    <span class="tag">Preguntas Frecuentes</span>
+    <h2 class="section-title mt-2 center">¿Tienes <span>Dudas</span>?</h2>
+    <div class="faq-list">
+
+      <div class="faq-item">
+        <button class="faq-question">
+          ¿Necesito registrarme para obtener una cotización?
+          <i class="fas fa-chevron-down faq-arrow"></i>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">No. Nuestra cotización es 100% en línea y sin registro. Solo ingresa los datos de tu mudanza y obtendrás un estimado inmediato con desglose completo de costos.</div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">
+          ¿El precio de la cotización es definitivo?
+          <i class="fas fa-chevron-down faq-arrow"></i>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">La cotización en línea es un estimado basado en los datos que ingresaste. El precio final se confirma después de evaluar accesos, pisos sin elevador, volumen real de objetos y condiciones específicas del servicio. En la mayoría de los casos el precio es muy cercano al estimado.</div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">
+          ¿Cómo se calcula el precio de la mudanza?
+          <i class="fas fa-chevron-down faq-arrow"></i>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">El precio se calcula sumando el costo base de la unidad elegida + los kilómetros de distancia (con tarifa por km y factor según rango local o foráneo) + los servicios adicionales seleccionados (embalaje, maniobras, etc.) + 16% de IVA.</div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">
+          ¿Qué incluye el servicio básico?
+          <i class="fas fa-chevron-down faq-arrow"></i>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">El precio base incluye el traslado en la unidad seleccionada y el conductor. La carga/descarga, el embalaje y el montaje de muebles son servicios adicionales que puedes agregar en la cotización según tus necesidades.</div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">
+          ¿Cuánto tiempo toma una mudanza local?
+          <i class="fas fa-chevron-down faq-arrow"></i>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">Depende del volumen de artículos y los accesos. Una mudanza de un departamento de 2 recámaras en la misma ciudad típicamente toma entre 3 y 6 horas incluyendo carga, traslado y descarga.</div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">
+          ¿Realizan mudanzas foráneas fuera de Puebla?
+          <i class="fas fa-chevron-down faq-arrow"></i>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">Sí. Atendemos rutas foráneas saliendo de Puebla y a nivel nacional. El costo se calcula por kilómetro con un multiplicador según la distancia. Contáctanos por WhatsApp para rutas específicas de largo recorrido.</div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">
+          ¿Qué formas de pago aceptan?
+          <i class="fas fa-chevron-down faq-arrow"></i>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">Aceptamos efectivo, transferencia bancaria y pago digital (OXXO Pay, CoDi). Coordinamos la forma de pago al confirmar el servicio por WhatsApp.</div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">
+          ¿Manejan objetos frágiles o de alto valor?
+          <i class="fas fa-chevron-down faq-arrow"></i>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">Sí. Contamos con materiales especiales de embalaje para vajillas, espejos, cuadros, televisores y artículos frágiles. Para pianos, cajas fuertes u objetos de maniobra especial, existe un cargo adicional por la complejidad del servicio.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  </section>
+</div>
+
+<!-- ══════════════════════════════════════
+     TAB 6: CONTACTO
+══════════════════════════════════════ -->
+<div class="view-tab-pane" id="tab-contacto">
+  <section id="contacto">
+  <div class="container">
+    <span class="tag">Hablemos</span>
+    <h2 class="section-title mt-2">Contáctanos</h2>
+    <div class="contact-grid">
+
+      <div class="contact-info">
+        <div class="contact-item">
+          <div class="contact-item-icon"><i class="fab fa-whatsapp"></i></div>
+          <div>
+            <h4>WhatsApp</h4>
+            <p><a href="#" id="waContactLink">Cargando...</a></p>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-item-icon"><i class="fas fa-phone"></i></div>
+          <div>
+            <h4>Teléfono</h4>
+            <p><a href="#" id="contactPhoneLink"><span id="contactPhone">Cargando...</span></a></p>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-item-icon"><i class="fas fa-envelope"></i></div>
+          <div>
+            <h4>Correo</h4>
+            <p id="contactEmail">Cargando...</p>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-item-icon"><i class="fas fa-map-marker-alt"></i></div>
+          <div>
+            <h4>Ubicación</h4>
+            <p id="contactAddress">Cargando...</p>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-item-icon"><i class="fas fa-clock"></i></div>
+          <div>
+            <h4>Horario</h4>
+            <p id="contactHours">Cargando...</p>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="quote-card">
+          <h3><i class="fas fa-paper-plane"></i> Envíanos un Mensaje</h3>
+          <form class="contact-form" id="contactForm">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Nombre</label>
+                <input class="form-control" name="nombre" type="text" placeholder="Tu nombre" required>
+              </div>
+              <div class="form-group">
+                <label>Teléfono</label>
+                <input class="form-control" name="telefono" type="tel" placeholder="999 123 4567" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>¿En qué te podemos ayudar?</label>
+              <textarea class="form-control" name="mensaje" rows="4" placeholder="Cuéntanos sobre tu mudanza, fecha, origen, destino..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%">
+              <i class="fab fa-whatsapp"></i> Enviar por WhatsApp
+            </button>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  </section>
+</div>
+
+<!-- ══════════════════════════════════════
+     FOOTER
+══════════════════════════════════════ -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo-text">MUDANZAS <span class="red">D'LA 14</span></div>
+        <p>El mejor servicio de fletes y mudanzas al mejor precio. Confianza, puntualidad y cuidado en cada traslado.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Servicios</h5>
+        <div class="footer-links">
+          <a href="#servicios" data-tab-nav="servicios">Mudanza Residencial</a>
+          <a href="#servicios" data-tab-nav="servicios">Mudanza Corporativa</a>
+          <a href="#servicios" data-tab-nav="servicios">Flete de Mercancía</a>
+          <a href="#servicios" data-tab-nav="servicios">Servicio Foráneo</a>
+          <a href="#servicios" data-tab-nav="servicios">Embalaje Profesional</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h5>Acceso Rápido</h5>
+        <div class="footer-links">
+          <a href="#cotizador" data-tab-nav="cotizador">Cotizar Ahora</a>
+          <a href="#faq" data-tab-nav="faq">Preguntas Frecuentes</a>
+          <a href="#contacto" data-tab-nav="contacto">Contacto</a>
+          <a href="admin.html"><i class="fas fa-lock" style="font-size:.8rem;margin-right:.3rem"></i> Panel Admin</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2024 Mudanzas D'La 14. Todos los derechos reservados.</span>
+      <span>Puebla, Puebla, México · <a href="#cotizador" data-tab-nav="cotizador">Cotizar</a></span>
+    </div>
+  </div>
+</footer>
+
+<!-- WhatsApp Float -->
+<div class="whatsapp-float" aria-label="WhatsApp">
+  <div class="whatsapp-tooltip">¡Escríbenos ahora!</div>
+  <a class="whatsapp-btn" id="waFloat" href="#" target="_blank" aria-label="Contactar por WhatsApp">
+    <i class="fab fa-whatsapp"></i>
+  </a>
+</div>
+
+<!-- Toast -->
+<div id="toast" role="alert" aria-live="polite"></div>
+
+<!-- Scripts -->
+<script src="js/calculator.js"></script>
+<script src="js/maps.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
+
