@@ -545,25 +545,26 @@ function updatePricePreview() {
 
   if (!amountEl || !breakdownEl) return;
 
-  const result = window.MudanzasCalc.calculateQuote(quoteData);
-  quoteResult  = result;
+  // Handle Coverage Limits (checked directly on km so it works on Step 1 even before selecting unit)
+  const kmNow = Number(quoteData.km || 0);
+  const maxCoverageKm = cfg?.distanceRanges?.maxCoverageKm || 500;
+  const exceedsCoverage = kmNow > maxCoverageKm;
 
-  // Handle Coverage Limits
-  if (result && result.exceedsCoverage) {
+  if (exceedsCoverage) {
     if (covWarn) {
       covWarn.style.display = 'flex';
-      if (kmVal) kmVal.textContent = result.km;
-      if (maxVal) maxVal.textContent = result.maxCoverageKm;
+      if (kmVal) kmVal.textContent = kmNow;
+      if (maxVal) maxVal.textContent = maxCoverageKm;
       if (waBtn) {
         const orig = (document.getElementById('origen')?.value || '').trim() || 'mi origen';
         const dest = (document.getElementById('destino')?.value || '').trim() || 'mi destino';
-        waBtn.href = `https://wa.me/${cfg.contact.whatsapp}?text=Hola,%20solicito%20cotización%20especial%20para%20un%20flete/mudanza%20de%20${result.km}%20km%20(De:%20${encodeURIComponent(orig)}%20A:%20${encodeURIComponent(dest)})`;
+        waBtn.href = `https://wa.me/${cfg.contact.whatsapp}?text=Hola,%20solicito%20cotización%20especial%20para%20un%20flete/mudanza%20de%20${kmNow}%20km%20(De:%20${encodeURIComponent(orig)}%20A:%20${encodeURIComponent(dest)})`;
       }
     }
     amountEl.innerHTML = '<span style="font-size:1.35rem;color:#f59e0b">Cotización Especial</span>';
     breakdownEl.innerHTML = `
       <div class="price-line" style="color:#f59e0b">
-        <span class="price-label"><i class="fas fa-exclamation-triangle" style="color:#f59e0b"></i> Ruta de ${result.km} km supera cobertura automática (${result.maxCoverageKm} km)</span>
+        <span class="price-label"><i class="fas fa-exclamation-triangle" style="color:#f59e0b"></i> Ruta de ${kmNow} km supera cobertura automática (${maxCoverageKm} km)</span>
         <span style="font-weight:700">Vía WhatsApp</span>
       </div>
       <div style="font-size:.82rem;color:var(--gray);margin-top:.4rem;line-height:1.45">
@@ -574,6 +575,9 @@ function updatePricePreview() {
   } else {
     if (covWarn) covWarn.style.display = 'none';
   }
+
+  const result = window.MudanzasCalc.calculateQuote(quoteData);
+  quoteResult  = result;
 
   if (!quoteData.unitId) {
     amountEl.textContent   = '$0';
